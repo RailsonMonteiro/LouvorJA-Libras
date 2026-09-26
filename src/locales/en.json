@@ -297,7 +297,13 @@
     "updates": {
       "check": "Check for updates",
       "checkHint": "Check whether a newer version is available",
-      "unavailable": "No update server is configured yet."
+      "checking": "Checking for updates...",
+      "downloading": "Downloading the update... {percent}%",
+      "downloaded": "Version {version} is ready - restart to install.",
+      "install": "Restart and install",
+      "upToDate": "You already have the latest version.",
+      "error": "Could not check right now. Try again later.",
+      "unavailable": "Automatic updates are not available in this install."
     }
   }
 }

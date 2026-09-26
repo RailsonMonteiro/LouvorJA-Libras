@@ -4,6 +4,7 @@ import { SignCache } from '../services/avatar/SignCache'
 import { openDatabase } from '../services/DatabaseService'
 import { LogService } from '../services/LogService'
 import { SettingsService } from '../services/SettingsService'
+import { UpdaterService } from '../services/UpdaterService'
 import { LibrasService } from '../services/libras/LibrasService'
 import { LouvorJAService } from '../services/louvorja/LouvorJAService'
 import { registerIpc } from './ipc'
@@ -11,6 +12,7 @@ import { registerAvatarIpc } from './ipc/avatar'
 import { registerLibrasIpc } from './ipc/libras'
 import { registerLouvorJAIpc } from './ipc/louvorja'
 import { registerOverlayIpc } from './ipc/overlay'
+import { registerUpdaterIpc } from './ipc/updater'
 import { installAppMenu } from './menus/appMenu'
 import { handleAppProtocol, registerAppScheme } from './protocol'
 import { applySecurity } from './security'
@@ -64,6 +66,8 @@ if (!app.requestSingleInstanceLock()) {
     registerLouvorJAIpc(louvorja)
     const overlay = new OverlayController()
     registerOverlayIpc(overlay)
+    const updater = new UpdaterService(logs)
+    registerUpdaterIpc(updater)
     installAppMenu()
 
     // "X" on the window only hides it - see wireWindow below - so the app otherwise never really
@@ -112,6 +116,9 @@ if (!app.requestSingleInstanceLock()) {
     if (overlayAutoOpen) mainWindow.once('ready-to-show', () => overlay.open(overlayDisplayId))
 
     if (settings.getAll().autoConnect) louvorja.connectToLast()
+
+    // Silent: only "Sobre" shows anything, there is no popup or forced restart.
+    void updater.check()
 
     app.on('second-instance', () => {
       if (mainWindow.isMinimized()) mainWindow.restore()

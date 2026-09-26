@@ -4,7 +4,8 @@ import {
   IpcChannels,
   type LouvorJAApi,
   type OverlayCommand,
-  type OverlayState
+  type OverlayState,
+  type UpdaterState
 } from '../../src/types/ipc'
 import type { AppSettings } from '../../src/types/settings'
 
@@ -66,6 +67,12 @@ const api: LouvorJAApi = {
     command: (command) => ipcRenderer.invoke(IpcChannels.overlayCommand, command),
     onStateChange: (listener) => subscribe<OverlayState>(IpcChannels.overlayStateChanged, listener),
     onCommand: (listener) => subscribe<OverlayCommand>(IpcChannels.overlayCommandEvent, listener)
+  },
+  updater: {
+    getState: () => ipcRenderer.invoke(IpcChannels.updaterGetState),
+    check: () => ipcRenderer.invoke(IpcChannels.updaterCheck),
+    install: () => ipcRenderer.invoke(IpcChannels.updaterInstall),
+    onStateChange: (listener) => subscribe<UpdaterState>(IpcChannels.updaterStateChanged, listener)
   }
 }
 

@@ -35,6 +35,12 @@ describe('settings store', () => {
         removeConnection: vi.fn(),
         onEvent: vi.fn()
       },
+      updater: {
+        getState: vi.fn(),
+        check: vi.fn(),
+        install: vi.fn(),
+        onStateChange: vi.fn()
+      },
       settings: {
         getAll: vi.fn().mockResolvedValue({ ...DEFAULT_SETTINGS, theme: 'dark' }),
         set: vi

@@ -6,9 +6,11 @@ import AvatarLayer from '@/modules/avatar/components/AvatarLayer.vue'
 import { useAppearance } from '@/composables/useAppearance'
 import { useOverlayStore } from '@/modules/overlay/stores/overlay.store'
 import { useSettingsStore } from '@/stores/settings.store'
+import { useUpdaterStore } from '@/stores/updater.store'
 
 useAppearance()
 void useOverlayStore().init()
+void useUpdaterStore().init()
 const { settings } = storeToRefs(useSettingsStore())
 </script>
 

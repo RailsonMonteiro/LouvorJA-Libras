@@ -297,7 +297,13 @@
     "updates": {
       "check": "Verificar atualizações",
       "checkHint": "Confira se há uma versão mais recente",
-      "unavailable": "Nenhum servidor de atualização configurado ainda."
+      "checking": "Procurando atualizações...",
+      "downloading": "Baixando a atualização... {percent}%",
+      "downloaded": "Versão {version} pronta - reinicie para instalar.",
+      "install": "Reiniciar e instalar",
+      "upToDate": "Você já está na versão mais recente.",
+      "error": "Não foi possível verificar agora. Tente de novo mais tarde.",
+      "unavailable": "Atualização automática não está disponível nesta instalação."
     }
   }
 }

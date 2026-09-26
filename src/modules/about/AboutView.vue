@@ -4,8 +4,10 @@ import ModuleHeader from '@/components/ModuleHeader.vue'
 import SettingsSection from '@/modules/settings/SettingsSection.vue'
 import logoUrl from '@/assets/images/logo.svg'
 import { useAppStore } from '@/stores/app.store'
+import { useUpdaterStore } from '@/stores/updater.store'
 
 const app = useAppStore()
+const updater = useUpdaterStore()
 
 /** Keys of `about.manual` in the locale files, each with its own panel and icon in the dialog. */
 const MANUAL_SECTIONS = ['connection', 'slides', 'projection', 'settings'] as const
@@ -19,18 +21,6 @@ const MANUAL_ICONS: Record<(typeof MANUAL_SECTIONS)[number], string> = {
 }
 
 const manualOpen = ref(false)
-
-/**
- * There is no update source configured yet (`electron-builder.yml` has `publish: null`, and the
- * project is not even a git repository), so there is nothing to really check against. This
- * button and status are the interface for it, ahead of that infrastructure - honest about not
- * checking anything real yet, not a placeholder pretending to.
- */
-const checkedUpdates = ref(false)
-
-function checkForUpdates(): void {
-  checkedUpdates.value = true
-}
 </script>
 
 <template>
@@ -84,10 +74,12 @@ function checkForUpdates(): void {
               type="button"
               class="action-tile"
               data-testid="about-check-updates"
-              @click="checkForUpdates"
+              :disabled="updater.checking"
+              @click="updater.check()"
             >
               <span class="action-icon action-icon-updates">
-                <v-icon size="22">mdi-cloud-refresh-outline</v-icon>
+                <v-icon v-if="updater.checking" size="22" class="mdi-spin">mdi-loading</v-icon>
+                <v-icon v-else size="22">mdi-cloud-refresh-outline</v-icon>
               </span>
               <span class="action-text">
                 <span class="action-title">{{ $t('about.updates.check') }}</span>
@@ -97,10 +89,58 @@ function checkForUpdates(): void {
             </button>
           </div>
 
-          <p v-if="checkedUpdates" class="update-status" data-testid="about-updates-status">
-            <v-icon size="16" class="mr-1">mdi-information-outline</v-icon>
-            {{ $t('about.updates.unavailable') }}
+          <p
+            v-if="updater.state.status !== 'idle'"
+            class="update-status"
+            data-testid="about-updates-status"
+            :data-status="updater.state.status"
+          >
+            <v-icon size="16" class="mr-1">
+              {{
+                updater.state.status === 'error'
+                  ? 'mdi-alert-circle-outline'
+                  : 'mdi-information-outline'
+              }}
+            </v-icon>
+            <template v-if="updater.state.status === 'checking'">
+              {{ $t('about.updates.checking') }}
+            </template>
+            <template v-else-if="updater.state.status === 'downloading'">
+              {{ $t('about.updates.downloading', { percent: updater.state.progressPercent ?? 0 }) }}
+            </template>
+            <template v-else-if="updater.state.status === 'downloaded'">
+              {{ $t('about.updates.downloaded', { version: updater.state.version ?? '' }) }}
+            </template>
+            <template v-else-if="updater.state.status === 'upToDate'">
+              {{ $t('about.updates.upToDate') }}
+            </template>
+            <template v-else-if="updater.state.status === 'error'">
+              {{ $t('about.updates.error') }}
+            </template>
+            <template v-else>
+              {{ $t('about.updates.unavailable') }}
+            </template>
           </p>
+          <v-progress-linear
+            v-if="updater.state.status === 'downloading'"
+            :model-value="updater.state.progressPercent ?? 0"
+            color="primary"
+            height="6"
+            rounded
+            class="mt-2"
+          />
+          <v-btn
+            v-if="updater.state.status === 'downloaded'"
+            color="primary"
+            variant="tonal"
+            prepend-icon="mdi-restart"
+            block
+            class="mt-3"
+            data-testid="about-install-update"
+            @click="updater.install()"
+          >
+            {{ $t('about.updates.install') }}
+          </v-btn>
         </SettingsSection>
       </v-col>
     </v-row>
@@ -224,6 +264,11 @@ function checkForUpdates(): void {
   outline-offset: 2px;
 }
 
+.action-tile:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
 .action-icon {
   display: flex;
   flex-shrink: 0;
@@ -273,5 +318,9 @@ function checkForUpdates(): void {
   margin: 14px 0 0;
   color: var(--sidebar-text-secondary);
   font-size: 13px;
+}
+
+.update-status[data-status='error'] {
+  color: rgb(var(--v-theme-error));
 }
 </style>

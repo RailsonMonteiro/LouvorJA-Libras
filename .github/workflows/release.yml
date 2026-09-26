@@ -1,0 +1,55 @@
+name: Release
+
+# Triggered by a version tag (e.g. "v1.2.0") pushed after package.json's own "version" field is
+# bumped to match - electron-builder names the release and its artifacts after package.json, not
+# the tag itself, so a mismatch here means the wrong-looking release comes out the other end.
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+# electron-builder's GitHub publisher needs this to create the release and upload to it.
+permissions:
+  contents: write
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+
+  release:
+    needs: quality
+    strategy:
+      fail-fast: false
+      # electron-builder cannot cross-build every target from one OS (macOS's own tooling builds
+      # the .dmg, for one) - one job per platform, each publishing its own artifacts to the same
+      # GitHub release (electron-builder creates it on the first job to get there, the rest just
+      # add their files to it).
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Build and publish
+        run: npm run release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # No signing certificate is configured (see docs/decisoes.md, "Pendências conhecidas") -
+          # without this, electron-builder's macOS build searches the CI machine's (empty) keychain
+          # for one and prints a scary warning before falling back to unsigned anyway.
+          CSC_IDENTITY_AUTO_DISCOVERY: false

@@ -20,5 +20,12 @@ mac:
 linux:
   target: [AppImage, deb]
   category: Education
-# Distribution is free: no code signing, licensing or update server is configured yet.
-publish: null
+# Distribution is free: no code signing or licensing server is configured. Updates check GitHub
+# Releases on this repo (electron-updater reads the "latest*.yml" electron-builder publishes
+# alongside each release's installer) - see UpdaterService (electron/services). Auto-update only
+# really works end to end for the win/nsis and linux/AppImage targets below; mac/dmg alone (no
+# "zip" target, no code signing) cannot self-update, only check.
+publish:
+  provider: github
+  owner: RailsonMonteiro
+  repo: LouvorJA-Libras

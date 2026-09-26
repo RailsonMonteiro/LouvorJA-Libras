@@ -36,6 +36,7 @@ npm run format       # Prettier
 npm test             # testes unitários e de integração (Vitest)
 npm run test:e2e     # build + testes end-to-end (Playwright + Electron)
 npm run dist         # gera o instalador com electron-builder
+npm run release      # gera e publica um release no GitHub (usado pelo CI ao empurrar uma tag "vX.Y.Z")
 npm run brand:build   # refaz a logo (marca do LouvorJA + mãos de Libras) e os ícones do app em build/
 npm run player:fetch  # baixa o player oficial do avatar para public/vlibras (roda antes de dev e build)
 npm run libras:oracle    # gera as respostas oficiais do VLibras usadas como referência
@@ -47,6 +48,17 @@ npm run mock:louvorja  # sobe um LouvorJA falso para testar a integração (veja
 > `ELECTRON_RUN_AS_NODE=1`, o app inicia como Node puro e falha em `app.requestSingleInstanceLock`.
 > Rode `unset ELECTRON_RUN_AS_NODE` (bash) ou `Remove-Item Env:ELECTRON_RUN_AS_NODE` (PowerShell)
 > antes de `npm run dev`. Os testes e2e já ignoram essa variável.
+
+### Publicando uma nova versão
+
+O app se auto-atualiza a partir dos releases do GitHub (veja "Atualizações" em
+[docs/decisoes.md](docs/decisoes.md)). Para publicar uma:
+
+1. Suba o campo `"version"` do `package.json` (ex.: `1.2.0` → `1.3.0`).
+2. Crie e empurre uma tag igual, com o prefixo `v`: `git tag v1.3.0 && git push origin v1.3.0`.
+3. O workflow `.github/workflows/release.yml` builda para Windows, macOS e Linux e publica tudo
+   num release do GitHub - inclusive o `latest.yml` que os apps já instalados usam para se
+   atualizar sozinhos.
 
 ## Licença
 

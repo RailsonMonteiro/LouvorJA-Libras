@@ -141,8 +141,24 @@ Analisada a partir do código-fonte do LouvorJA (Vue 3 + Vuetify 3, licença MIT
   disposição normal de novo, sem transição nenhuma (continua removida "de uma vez", sem travar),
   mas também sem empurrar a página que chega enquanto ainda existe.
 
+## Atualizações
+
+| Tema             | Decisão                                                                                                                                                                                                         | Motivo                                                                                                                                     |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Mecanismo        | `electron-updater`, lendo os releases do GitHub (`electron-builder.yml`: `publish.provider: github`)                                                                                                            | Grátis, é onde o repositório já mora, e é o provedor mais testado do electron-builder.                                                     |
+| Comportamento    | Baixa sozinho assim que encontra uma versão nova; instalar exige um clique em "Sobre" (`autoUpdater.autoInstallOnAppQuit = false`)                                                                              | Baixar sozinho não custa nada; trocar o binário embaixo de alguém sem avisar (e sem poder adiar) sim - a pessoa decide quando reiniciar.   |
+| Quando verifica  | Uma vez, em silêncio, ao abrir (`electron/main/index.ts`), e de novo a qualquer momento pelo botão em "Sobre"                                                                                                   | `checkForUpdates()`, não `checkForUpdatesAndNotify()` - sem popup nem notificação nativa; só aparece para quem olhar a tela "Sobre".       |
+| Limite conhecido | Só funciona de ponta a ponta no Windows (NSIS) e Linux (AppImage); no macOS (`dmg` sozinho, sem `zip` nem assinatura) só consegue checar, não se auto-instalar                                                  | Squirrel.Mac exige assinatura de código para o passo de instalar, que este projeto ainda não tem.                                          |
+| Publicação       | `.github/workflows/release.yml`: uma tag `vX.Y.Z` builda nas três plataformas e publica tudo (instalador + `latest.yml`) no mesmo release do GitHub via `npm run release` (`electron-builder --publish always`) | Sem isso o botão só teria releases pra apontar quando alguém subisse os arquivos à mão - o mesmo `latest.yml` que os apps instalados leem. |
+
+Enquanto não existe nenhum release publicado, "Verificar atualizações" mostra o erro genérico
+(`about.updates.error`) - o `electron-updater` pede `.../releases/download/vX.Y.Z/latest.yml` e o
+GitHub responde 404. Não é um bug: é exatamente o que deveria acontecer até o primeiro `git push`
+de uma tag de versão.
+
 ## Pendências conhecidas
 
 - Ícone do aplicativo (`build/icon.*`).
 - `appId` (`org.louvorja.libras`) é provisório.
-- Assinatura de código e atualização automática (módulo "Atualizações") ficam para depois.
+- Assinatura de código (deixaria a atualização automática completa no macOS também, e tiraria os
+  avisos do Windows SmartScreen no instalador).

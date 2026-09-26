@@ -33,12 +33,14 @@
     "libras:oracle": "node scripts/libras/oracle.mts",
     "mock:louvorja": "node scripts/mock-louvorja/index.mts",
     "pack": "npm run build && electron-builder --dir",
-    "dist": "npm run build && electron-builder"
+    "dist": "npm run build && electron-builder",
+    "release": "npm run build && electron-builder --publish always"
   },
   "dependencies": {
     "@flaticon/flaticon-uicons": "^3.3.1",
     "@fontsource/roboto": "^5.3.0",
     "@mdi/font": "^7.4.47",
+    "electron-updater": "^6.8.9",
     "pinia": "^4.0.3",
     "vue": "^3.5.43",
     "vue-country-flag-next": "^2.3.2",

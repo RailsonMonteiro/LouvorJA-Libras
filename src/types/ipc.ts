@@ -32,12 +32,16 @@ export const IpcChannels = {
   overlayClose: 'overlay:close',
   overlayIdentify: 'overlay:identify',
   overlayCommand: 'overlay:command',
+  updaterGetState: 'updater:get-state',
+  updaterCheck: 'updater:check',
+  updaterInstall: 'updater:install',
   /** main -> renderer events */
   windowMaximizedChanged: 'window:maximized-changed',
   louvorjaEvent: 'louvorja:event',
   settingsChanged: 'settings:changed',
   overlayStateChanged: 'overlay:state-changed',
-  overlayCommandEvent: 'overlay:command-event'
+  overlayCommandEvent: 'overlay:command-event',
+  updaterStateChanged: 'updater:state-changed'
 } as const
 
 export type IpcChannel = (typeof IpcChannels)[keyof typeof IpcChannels]
@@ -97,6 +101,26 @@ export type OverlayCommand =
   | { type: 'pause' }
   | { type: 'resume' }
 
+/**
+ * - `unavailable`: this build cannot self-update (a dev run, or `app.isPackaged` is false).
+ * - `checking`: asking GitHub Releases whether a newer version exists.
+ * - `downloading`: found one and is fetching the installer (`progressPercent` fills in).
+ * - `downloaded`: ready - `install()` restarts the app to apply it.
+ * - `upToDate`: checked, already on the latest version.
+ * - `error`: the check or download failed (`error` has a message).
+ */
+export type UpdaterStatus =
+  'idle' | 'unavailable' | 'checking' | 'downloading' | 'downloaded' | 'upToDate' | 'error'
+
+export interface UpdaterState {
+  status: UpdaterStatus
+  /** The version being downloaded or ready to install, once known. */
+  version: string | null
+  /** 0-100 while `downloading`. */
+  progressPercent: number | null
+  error: string | null
+}
+
 /** API exposed to the renderer as `window.louvorja` through the preload script. */
 export interface LouvorJAApi {
   app: {
@@ -150,5 +174,14 @@ export interface LouvorJAApi {
     onStateChange(listener: (state: OverlayState) => void): () => void
     /** For the overlay window itself: commands sent from the projection page. */
     onCommand(listener: (command: OverlayCommand) => void): () => void
+  }
+  /** Checks GitHub Releases for a newer build, downloads it and, on request, installs it. */
+  updater: {
+    getState(): Promise<UpdaterState>
+    /** Starts a check (a no-op while one is already checking or downloading) and returns at once. */
+    check(): Promise<UpdaterState>
+    /** Quits and installs the downloaded update. Ignored unless a version is ready. */
+    install(): Promise<void>
+    onStateChange(listener: (state: UpdaterState) => void): () => void
   }
 }
