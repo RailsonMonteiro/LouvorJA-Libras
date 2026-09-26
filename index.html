@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LouvorJA Libras</title>
+    <!-- The opening screen is plain HTML and CSS: it is painted before any script has run. -->
+    <style>
+      html,
+      body {
+        margin: 0;
+        background: #f5f7fb;
+      }
+      @media (prefers-color-scheme: dark) {
+        html,
+        body {
+          background: #181722;
+        }
+      }
+      #splash {
+        position: fixed;
+        inset: 0;
+        z-index: 2147483647;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 22px;
+        background: #f5f7fb;
+        color: #666;
+        /* main.ts imports the Roboto files as a static (not dynamic) import specifically so
+           Vite links them in this page's own <head>, loaded before main.ts runs: Roboto is
+           already there for this screen's first frame, with no later swap to shift its size. */
+        font-family: Roboto, 'Segoe UI', system-ui, sans-serif;
+        transition: opacity 0.4s ease;
+      }
+      #splash.leaving {
+        opacity: 0;
+        pointer-events: none;
+      }
+      #splash .splash-brand {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 14px;
+      }
+      #splash .splash-logo-wrap {
+        position: relative;
+        height: 108px;
+        overflow: hidden;
+        /* Reserves the right width from the very first layout, before the file is even fetched,
+           so the logo never pops from a small placeholder box to its full size. */
+        aspect-ratio: 392 / 300;
+      }
+      #splash .splash-logo {
+        height: 100%;
+      }
+      /* A soft white band sweeping across the logo at an angle, then a pause before it repeats -
+         a brief flash, not a nonstop tick. Moved by `transform` (not `background-position`, which
+         is what made the old version feel choppy) so the compositor can animate it smoothly. */
+      #splash .splash-logo-shine {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          115deg,
+          transparent 40%,
+          rgba(255, 255, 255, 0.85) 50%,
+          transparent 60%
+        );
+        transform: translateX(-160%);
+        animation: splash-shine-sweep 5s ease-in-out infinite;
+        will-change: transform;
+        pointer-events: none;
+      }
+      /* Same duration and beats as .splash-title's own shine below, so the two sweep together
+         instead of drifting in and out of step. */
+      @keyframes splash-shine-sweep {
+        0% {
+          transform: translateX(-160%);
+        }
+        70% {
+          transform: translateX(160%);
+        }
+        100% {
+          transform: translateX(160%);
+        }
+      }
+      #splash .splash-title {
+        font-size: 30px;
+        font-weight: 800;
+        letter-spacing: 0.2px;
+        text-align: center;
+        /* Same gradient as every page's title once the app itself is up (.gradient-text,
+           src/styles/main.scss) - duplicated here, plain values, because this screen paints
+           before any script (Vue, that stylesheet) has run. Layered with its own shine band on
+           top (same shape as the logo's, second background layer here since text can't hold a
+           separate transformed child - only the highlight layer's position moves; the base
+           gradient's stays put at "0 0"), so the name catches the same light as the logo. */
+        background:
+          linear-gradient(115deg, transparent 40%, rgba(255, 255, 255, 0.9) 50%, transparent 60%),
+          linear-gradient(120deg, #6366f1 0%, #14b8a6 100%);
+        background-repeat: no-repeat, no-repeat;
+        background-size:
+          60% 100%,
+          100% 100%;
+        background-position:
+          -160% 0,
+          0 0;
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+        animation: splash-title-shine 5s ease-in-out infinite;
+      }
+      @keyframes splash-title-shine {
+        0% {
+          background-position:
+            -160% 0,
+            0 0;
+        }
+        70% {
+          background-position:
+            260% 0,
+            0 0;
+        }
+        100% {
+          background-position:
+            260% 0,
+            0 0;
+        }
+      }
+      #splash .splash-subtitle {
+        margin-top: -4px;
+        font-size: 15px;
+        font-weight: 400;
+      }
+      #splash .splash-bar-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      #splash .splash-bar {
+        width: 340px;
+        height: 8px;
+        overflow: hidden;
+        border-radius: 4px;
+        background: rgba(99, 102, 241, 0.18);
+      }
+      #splash .splash-bar > div {
+        position: relative;
+        width: 0;
+        height: 100%;
+        overflow: hidden;
+        border-radius: 4px;
+        background: linear-gradient(90deg, #6366f1 0%, #14b8a6 100%);
+        transition: width 0.35s ease;
+      }
+      /* The sweeping highlight of the Windows 11 copy dialog: a soft band of light that loops
+         across the filled part of the bar, regardless of how wide it currently is. */
+      #splash .splash-bar > div::after {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          100deg,
+          transparent 30%,
+          rgba(255, 255, 255, 0.65) 50%,
+          transparent 70%
+        );
+        background-size: 160px 100%;
+        background-repeat: no-repeat;
+        animation: splash-shimmer 3.4s linear infinite;
+        content: '';
+      }
+      @keyframes splash-shimmer {
+        from {
+          /* Starts fully hidden to the left and ends fully hidden past the bar's full width
+             (340px), so exactly one band sweeps across, never two at once. */
+          background-position: -160px 0;
+        }
+        to {
+          background-position: 500px 0;
+        }
+      }
+      #splash .splash-percent {
+        min-width: 38px;
+        /* Reads fine on both the light and dark splash background - no separate dark-mode
+           override needed, unlike the old dark green (#16a34a). */
+        color: #6366f1;
+        font-size: 13px;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        text-align: right;
+      }
+      #splash .splash-status {
+        min-height: 18px;
+        font-size: 13px;
+        letter-spacing: 0.3px;
+      }
+      @media (prefers-color-scheme: dark) {
+        #splash {
+          background: #181722;
+          color: #8b8e9b;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="splash" role="status" aria-live="polite" data-testid="splash">
+      <div class="splash-brand">
+        <div class="splash-logo-wrap">
+          <img class="splash-logo" src="/src/assets/images/logo.svg" alt="" />
+          <div class="splash-logo-shine" aria-hidden="true"></div>
+        </div>
+        <div class="splash-title">Iniciando o LouvorJA Libras</div>
+        <div class="splash-subtitle">Aguarde, estamos preparando tudo para você.</div>
+      </div>
+      <div class="splash-bar-row">
+        <div class="splash-bar"><div id="splash-progress"></div></div>
+        <div class="splash-percent" id="splash-percent">0%</div>
+      </div>
+      <div class="splash-status" id="splash-status"></div>
+    </div>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

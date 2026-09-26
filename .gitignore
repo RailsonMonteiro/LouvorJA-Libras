@@ -1,0 +1,14 @@
+node_modules/
+out/
+dist/
+release/
+playwright-report/
+test-results/
+*.log
+.DS_Store
+.env
+.env.*
+!.env.example
+
+# Official VLibras Unity player, fetched by scripts/fetch-vlibras-player.mts
+public/vlibras/

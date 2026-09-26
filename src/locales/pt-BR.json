@@ -1,0 +1,303 @@
+{
+  "app": {
+    "name": "LouvorJA Libras",
+    "tagline": "Interpretação em Libras com avatar 3D"
+  },
+  "nav": {
+    "home": "Página inicial",
+    "settings": "Configurações",
+    "louvorja": "Conexão",
+    "slides": "Slides",
+    "projection": "Projeção",
+    "about": "Sobre"
+  },
+  "sidebar": {
+    "pin": "Fixar menu",
+    "unpin": "Desafixar menu"
+  },
+  "window": {
+    "minimize": "Minimizar",
+    "maximize": "Maximizar",
+    "restore": "Restaurar",
+    "close": "Fechar"
+  },
+  "settings": {
+    "title": "Configurações",
+    "general": "Geral",
+    "language": "Idioma",
+    "theme": "Tema",
+    "themes": {
+      "system": "Seguir o sistema",
+      "light": "Claro",
+      "dark": "Escuro"
+    },
+    "sidebarPinned": "Manter o menu lateral sempre aberto",
+    "saveError": "Não foi possível salvar a configuração.",
+    "autoConnect": "Conectar automaticamente ao último LouvorJA ao abrir o aplicativo",
+    "runInBackground": "Executar em segundo plano",
+    "runInBackgroundTesting": "Recurso em teste, ainda desativado nesta versão.",
+    "libras": {
+      "title": "Tradutor de Libras",
+      "online": "Usar o tradutor online do VLibras",
+      "onlineHint": "O texto dos slides é enviado ao servidor configurado abaixo. O que já foi traduzido fica salvo neste computador e funciona sem internet.",
+      "translatorUrl": "Endereço do tradutor",
+      "signsIndexUrl": "Endereço do catálogo de sinais",
+      "invalidUrl": "Informe um endereço http:// ou https:// válido.",
+      "catalog": "Catálogo de sinais",
+      "catalogEmpty": "Ainda não baixado.",
+      "catalogInfo": "{count} sinais · atualizado em {date}",
+      "refresh": "Atualizar catálogo",
+      "refreshError": "Não foi possível baixar o catálogo. Confira o endereço e a internet.",
+      "sections": {
+        "online": {
+          "title": "Tradução online"
+        },
+        "catalog": {
+          "description": "A lista dos sinais que existem. Serve para conferir cada palavra e para o tradutor deste computador achar o infinitivo dos verbos e o singular dos nomes."
+        },
+        "dictionary": {
+          "title": "Dicionário de sinais",
+          "description": "De onde vêm os sinais que o avatar faz. Cada sinal é baixado uma vez e depois funciona sem internet."
+        }
+      }
+    },
+    "avatar": {
+      "dictionaryUrl": "Endereço do dicionário de sinais",
+      "cache": "Sinais guardados neste computador",
+      "cacheEmpty": "Nenhum ainda. Cada sinal é baixado uma vez e depois funciona sem internet.",
+      "cacheInfo": "{count} sinais · {size}",
+      "clear": "Limpar sinais guardados"
+    },
+    "tabs": {
+      "general": "Geral",
+      "translator": "Tradutor",
+      "overlay": "Overlay"
+    }
+  },
+  "errors": {
+    "apiUnavailable": "Este aplicativo precisa ser executado dentro do Electron."
+  },
+  "integration": {
+    "title": "Integração com o LouvorJA",
+    "connect": "Conectar",
+    "disconnect": "Desconectar",
+    "cancel": "Cancelar",
+    "form": {
+      "title": "Conexão",
+      "host": "Endereço",
+      "hostHint": "Ex.: 192.168.0.10 (ou 127.0.0.1 neste computador)",
+      "port": "Porta",
+      "hostInvalid": "Informe um IP ou nome válido, sem http://, porta ou barras.",
+      "portInvalid": "A porta deve ser um número de 1 a 65535.",
+      "token": "Token",
+      "tokenHint": "Aparece na aba Transmitir do LouvorJA. Neste mesmo computador não é preciso.",
+      "tokenInvalid": "O token só pode ter letras e números."
+    },
+    "states": {
+      "disconnected": "Desconectado",
+      "connecting": "Conectando…",
+      "connected": "Conectado",
+      "reconnecting": "Reconectando…"
+    },
+    "status": {
+      "endpoint": "Endereço: {endpoint}",
+      "attempt": "Tentativa {n}",
+      "retryIn": "Nova tentativa em {seconds} s",
+      "idle": "Informe o endereço do LouvorJA e conecte.",
+      "server": "Programa: LouvorJA {version} (API {protocol})"
+    },
+    "errors": {
+      "unreachable": "Não foi possível alcançar o LouvorJA. Confira o endereço, a porta e se o LouvorJA está aberto.",
+      "timeout": "O LouvorJA não respondeu a tempo.",
+      "closed": "A conexão com o LouvorJA foi encerrada.",
+      "httpStatus": "O LouvorJA respondeu com erro (HTTP {detail}).",
+      "unauthorized": "O LouvorJA recusou o token. Confira o token mostrado na aba Transmitir.",
+      "incompatible": "O endereço respondeu, mas não parece ser o servidor de transmissão do LouvorJA. Confira o endereço e a porta."
+    },
+    "help": {
+      "title": "Como conectar",
+      "text": "No LouvorJA, abra a aba Transmitir e clique em Iniciar Servidor. Informe aqui o endereço, a porta e o token que ele mostra. Se o LouvorJA estiver neste computador, deixe o token em branco."
+    },
+    "info": {
+      "title": "Status da conexão",
+      "empty": "Nenhuma conexão ativa.",
+      "computer": "Computador",
+      "app": "Aplicativo",
+      "appValue": "LouvorJA {version} (API {protocol})",
+      "since": "Conectado desde"
+    }
+  },
+  "slides": {
+    "title": "Slides",
+    "current": "Slide atual",
+    "live": "Ao vivo",
+    "received": "Slides recebidos",
+    "empty": "Aguardando slides do LouvorJA",
+    "emptyHint": "Conecte-se ao LouvorJA e inicie uma apresentação.",
+    "position": "Slide {n} de {total}",
+    "backToLive": "Voltar ao slide atual",
+    "goToIntegration": "Ir para a conexão",
+    "presentation": "Apresentação: {title}",
+    "noPresentation": "Nenhuma apresentação em andamento",
+    "untitled": "Sem título",
+    "kinds": {
+      "lyrics": "Letra",
+      "verse": "Versículo",
+      "text": "Texto",
+      "image": "Imagem",
+      "other": "Outro"
+    }
+  },
+  "libras": {
+    "title": "Glosa em Libras",
+    "sources": {
+      "manual": "Editada",
+      "cache": "Salva",
+      "local": "Local",
+      "online": "Online",
+      "fallback": "Palavras do slide"
+    },
+    "sourceHints": {
+      "manual": "Escrita ou corrigida por uma pessoa.",
+      "cache": "Já traduzida antes e guardada neste computador.",
+      "local": "Tradução simplificada, feita neste computador.",
+      "online": "Traduzida agora pelo servidor do VLibras.",
+      "fallback": "Sem tradução automática: são só as palavras do slide, sem gramática de Libras."
+    },
+    "availability": {
+      "sign": "Há sinal no dicionário",
+      "spelled": "Sem sinal próprio: será soletrado",
+      "missing": "Sem sinal e não dá para soletrar",
+      "unknown": "Catálogo de sinais não carregado"
+    },
+    "edit": "Editar glosa",
+    "restore": "Voltar à automática",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "editTitle": "Editar glosa",
+    "editLabel": "Glosa",
+    "editHint": "Palavras em maiúsculas, separadas por espaço. Use _ para sinais compostos (ESPÍRITO_SANTO).",
+    "empty": "Sem texto para traduzir.",
+    "loading": "Traduzindo…",
+    "fallbackHint": "A tradução automática está desligada. Ative o tradutor online em Configurações ou edite a glosa à mão.",
+    "localHint": "Tradução simplificada feita neste computador: pode errar verbos, plurais e palavras com mais de um sentido. Ative o tradutor online em Configurações para a tradução completa, ou edite a glosa à mão.",
+    "catalogHint": "O catálogo de sinais ainda não foi baixado. Sem ele não dá para saber quais sinais existem, e a tradução deste computador não coloca os verbos no infinitivo nem os plurais no singular.",
+    "downloadCatalog": "Baixar catálogo",
+    "openSettings": "Abrir configurações",
+    "error": "Não foi possível traduzir."
+  },
+  "projection": {
+    "title": "Projeção",
+    "stage": "Como está sendo projetado",
+    "avatar": "Avatar e ajustes",
+    "signs": "Sinais",
+    "noGloss": "Nenhuma glosa para interpretar ainda. Use \"Testar avatar\" para vê-lo em ação.",
+    "status": {
+      "checking": "Verificando o player…",
+      "unavailable": "Player não instalado",
+      "loading": "Carregando avatar {progress}%",
+      "ready": "Pronto",
+      "paused": "Pausado",
+      "playing": "Interpretando {count} de {max}",
+      "error": "O avatar não iniciou",
+      "signing": "Interpretando"
+    },
+    "unavailableHint": "O player do avatar não foi baixado. Rode \"npm run player:fetch\" com internet e abra o app de novo.",
+    "errorHint": "O avatar demorou demais ou falhou ao iniciar.",
+    "retry": "Tentar de novo",
+    "play": "Interpretar",
+    "test": "Testar avatar",
+    "pause": "Pausar",
+    "resume": "Continuar",
+    "stop": "Parar",
+    "repeat": "Repetir",
+    "speed": "Velocidade",
+    "region": "Região dos sinais",
+    "autoInterpret": "Interpretar cada slide automaticamente",
+    "showSlide": "Mostrar o slide ao fundo",
+    "position": "Posição do avatar",
+    "positions": {
+      "left": "Esquerda",
+      "center": "Centro",
+      "right": "Direita"
+    },
+    "size": "Tamanho",
+    "sync": {
+      "title": "Sincronização",
+      "steps": {
+        "slide": "Slide",
+        "translation": "Tradução",
+        "signs": "Sinais",
+        "avatar": "Avatar"
+      },
+      "slideOn": "no ar",
+      "slideNone": "nenhum",
+      "signs": {
+        "idle": "aguardando",
+        "loading": "baixando",
+        "ready": "prontos",
+        "partial": "faltam alguns"
+      },
+      "startsIn": "começa em {seconds} s"
+    },
+    "overlay": {
+      "title": "Sobre a apresentação (overlay)",
+      "description": "Uma janela transparente, sempre por cima e sem cliques, mostra o avatar sobre a apresentação do LouvorJA. Use no telão ou no monitor da plateia.",
+      "statusOpen": "Aberto na tela {screen}",
+      "statusClosed": "Fechado",
+      "display": "Tela do overlay",
+      "singleScreen": "Só há uma tela conectada: o avatar ficará sobre tudo o que estiver nela. Ligue o projetor para escolher outra.",
+      "autoOpen": "Abrir o overlay ao iniciar o app",
+      "open": "Abrir overlay",
+      "close": "Fechar overlay",
+      "onlyDuringPresentation": "Mostrar o avatar só durante a apresentação",
+      "screenName": "Tela {number}",
+      "autoShort": "Automática",
+      "autoCaption": "Segunda tela, se houver",
+      "primaryShort": "principal",
+      "identify": "Identificar telas",
+      "inUse": "O overlay está aqui"
+    },
+    "delay": "Atraso para começar a interpretar",
+    "advance": "Adiantamento para começar a interpretar",
+    "delayNone": "sem atraso",
+    "delayValue": "{seconds} s",
+    "delayHint": "Atrasar espera mais um pouco depois que os sinais já estão prontos. Adiantar diminui quanto o avatar espera os sinais baixarem antes de começar mesmo assim. Conta a partir do momento em que o slide entra no ar. Vale para cada slide (e para o overlay)."
+  },
+  "splash": {
+    "pages": "Preparando as telas…",
+    "avatar": "Carregando o avatar…",
+    "ready": "Pronto"
+  },
+  "about": {
+    "version": "Versão {version}",
+    "manual": {
+      "title": "Manual",
+      "description": "Como usar cada parte do app, e verificar se há uma versão nova.",
+      "open": "Ver manual",
+      "openHint": "Como usar cada parte do app",
+      "close": "Fechar",
+      "connection": {
+        "title": "Conexão",
+        "text": "Conecte-se ao LouvorJA para receber os slides automaticamente e sinalizar em Libras."
+      },
+      "slides": {
+        "title": "Slides",
+        "text": "Mostra o slide atual, ao vivo, e o histórico dos últimos recebidos do LouvorJA."
+      },
+      "projection": {
+        "title": "Projeção",
+        "text": "Escolha o avatar (Ícaro, Guga ou Hosana), veja como ele está sendo projetado e ajuste velocidade, posição, tamanho e opacidade."
+      },
+      "settings": {
+        "title": "Configurações",
+        "text": "Idioma, tema, o tradutor de Libras (local ou online) e o overlay - a janela transparente que mostra o avatar por cima de qualquer programa."
+      }
+    },
+    "updates": {
+      "check": "Verificar atualizações",
+      "checkHint": "Confira se há uma versão mais recente",
+      "unavailable": "Nenhum servidor de atualização configurado ainda."
+    }
+  }
+}

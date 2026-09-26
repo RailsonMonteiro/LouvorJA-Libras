@@ -1,0 +1,128 @@
+// The app's own visual identity (2026-09-25) - indigo/teal, replacing the green/yellow that was
+// copied from LouvorJA (see docs/decisoes.md for that original choice and why). Grown out of a
+// one-page test on the Página inicial (src/modules/dashboard/DashboardView.vue) that was kept
+// over an alternative and then extended app-wide: the two colors, a shared gradient for headings
+// (--accent-gradient/.gradient-text below), a touch more corner radius and a softer, faintly
+// tinted shadow instead of a flat black one - not just new hex values on the same shapes.
+
+:root {
+  --accent-blue: #6366f1;
+  --accent-blue-dark: #4338ca;
+  --accent-yellow: #14b8a6;
+  --accent-gradient: linear-gradient(120deg, var(--accent-blue) 0%, var(--accent-yellow) 100%);
+
+  --main-bg: #f5f7fb;
+  --card-bg: #ffffff;
+  --sidebar-bg: #ffffff;
+  --sidebar-border: #e0e0e0;
+  --border-color: #e0e0e0;
+
+  --sidebar-text: #333333;
+  --sidebar-text-secondary: #666666;
+  --sidebar-hover: rgba(99, 102, 241, 0.08);
+  --sidebar-active: var(--accent-gradient);
+
+  --shadow: 0 2px 10px rgba(99, 102, 241, 0.12);
+  --shadow-hover: 0 6px 20px rgba(99, 102, 241, 0.18);
+
+  --titlebar-height: 32px;
+  --sidebar-width: 300px;
+  --sidebar-collapsed-width: 72px;
+  --border-radius: 14px;
+  --transition: all 0.3s ease;
+}
+
+.v-theme--dark {
+  --main-bg: #262a3b;
+  --card-bg: #2f3449;
+  --sidebar-bg: #181722;
+  --sidebar-border: rgba(255, 255, 255, 0.12);
+  --border-color: rgba(255, 255, 255, 0.12);
+  --sidebar-text: #ffffff;
+  --sidebar-text-secondary: #8b8e9b;
+  --sidebar-hover: rgba(99, 102, 241, 0.18);
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-hover: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
+// The same treatment as the Página inicial's own name - used for every page's title now, so the
+// whole app carries one consistent, deliberate typographic signature instead of plain text.
+.gradient-text {
+  background: var(--accent-gradient);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-family: 'Roboto', sans-serif;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+input,
+textarea {
+  -webkit-user-select: auto;
+  user-select: auto;
+}
+
+img,
+a {
+  -webkit-user-drag: none;
+}
+
+.bg-main {
+  background-color: var(--main-bg) !important;
+}
+
+#app,
+.v-application {
+  height: 100vh;
+}
+
+.v-card {
+  background: var(--card-bg) !important;
+  border-radius: var(--border-radius) !important;
+  box-shadow: var(--shadow) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+// Indigo scrollbar thumb that turns teal on hover.
+*::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  border-radius: 8px;
+  background-color: rgba(128, 128, 128, 0.15);
+}
+
+*::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  background-color: var(--accent-blue);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--accent-yellow);
+}
+
+// Rounded indigo/teal badge that holds a module icon (or image) next to the page title.
+.module-icon-box {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  background: var(--accent-gradient);
+  border-radius: var(--border-radius);
+  color: white;
+  box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
+}
+
+.page-container {
+  max-width: 1100px;
+  margin-inline: auto;
+}
