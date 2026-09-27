@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import ModuleHeader from '@/components/ModuleHeader.vue'
+import DeveloperCredit, { type DeveloperLink } from '@/modules/about/components/DeveloperCredit.vue'
 import SettingsSection from '@/modules/settings/SettingsSection.vue'
 import logoUrl from '@/assets/images/logo.svg'
 import { useAppStore } from '@/stores/app.store'
@@ -8,6 +9,46 @@ import { useUpdaterStore } from '@/stores/updater.store'
 
 const app = useAppStore()
 const updater = useUpdaterStore()
+
+interface Developer {
+  id: string
+  name: string
+  role: string
+  avatarUrl: string
+  description: string
+  links: DeveloperLink[]
+}
+
+/**
+ * Bios, not UI chrome: kept in Portuguese regardless of the app's own language, the same way a
+ * name would not be translated (source: developers.json in the original Louvor JA project).
+ */
+const DEVELOPERS: Developer[] = [
+  {
+    id: 'mayco',
+    name: 'Mayco Rolbuche',
+    role: 'Idealizador e Desenvolvedor Principal',
+    avatarUrl: 'https://github.com/maycorolbuche.png',
+    description: 'Criador original do projeto Louvor JA.',
+    links: [
+      { icon: 'mdi-github', url: 'https://github.com/maycorolbuche', label: 'GitHub' },
+      { icon: 'mdi-web', url: 'https://maycorolbuche.com.br', label: 'Site' },
+      { icon: 'mdi-facebook', url: 'https://www.facebook.com/maycorolbuche', label: 'Facebook' },
+      { icon: 'mdi-email', url: 'mailto:mayco.rolbuche@yahoo.com.br', label: 'E-mail' }
+    ]
+  },
+  {
+    id: 'railson',
+    name: 'Railson Monteiro',
+    role: 'Desenvolvedor Principal - LouvorJA Libras',
+    avatarUrl: 'https://github.com/railsonmonteiro.png',
+    description: 'Responsável pelo desenvolvimento desta distribuição em Libras do Louvor JA.',
+    links: [
+      { icon: 'mdi-github', url: 'https://github.com/railsonmonteiro', label: 'GitHub' },
+      { icon: 'mdi-email', url: 'mailto:railsonmonteiro.tec@gmail.com', label: 'E-mail' }
+    ]
+  }
+]
 
 /** Keys of `about.manual` in the locale files, each with its own panel and icon in the dialog. */
 const MANUAL_SECTIONS = ['connection', 'slides', 'projection', 'settings'] as const
@@ -43,6 +84,27 @@ const manualOpen = ref(false)
             </div>
           </v-card-text>
         </v-card>
+      </v-col>
+    </v-row>
+
+    <v-row class="mt-2" justify="center">
+      <v-col cols="12" md="7" lg="5">
+        <SettingsSection
+          icon="mdi-account-group"
+          :title="$t('about.credits.title')"
+          :description="$t('about.credits.description')"
+        >
+          <DeveloperCredit
+            v-for="developer in DEVELOPERS"
+            :key="developer.id"
+            :name="developer.name"
+            :role="developer.role"
+            :avatar-url="developer.avatarUrl"
+            :description="developer.description"
+            :links="developer.links"
+            :data-testid="`about-developer-${developer.id}`"
+          />
+        </SettingsSection>
       </v-col>
     </v-row>
 

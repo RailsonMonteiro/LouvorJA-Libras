@@ -293,11 +293,28 @@ export class LouvorJAApiAdapter implements LouvorJAAdapter {
       throw new ConnectionError('unreachable', (error as Error).message)
     }
 
-    if (response.status === 401) throw new ConnectionError('unauthorized')
+    if (response.status === 401) {
+      // Logged instead of guessed at: this is the shape of the token actually sent, without the
+      // token itself, so a real report can be checked against what the person typed/pasted -
+      // e.g. an unexpected length or a swapped case on the first letter would show up here even
+      // though the token itself never leaves this machine (see docs/protocolo-louvorja.md,
+      // "Token recusado" em alguns computadores).
+      this.options.onWarning?.(
+        `Token refused by ${this.dialect} (${describeToken(token)}) at ${path}`
+      )
+      throw new ConnectionError('unauthorized')
+    }
 
     const parsed = envelope.safeParse(await response.json().catch(() => null))
     return { status: response.status, body: parsed.success ? parsed.data : null }
   }
+}
+
+/** The token's shape (never its value) for logs: length and its first/last character. */
+function describeToken(token: string): string {
+  if (!token) return 'no token sent'
+  if (token.length === 1) return `1 char "${token}"`
+  return `${token.length} chars "${token[0]}"…"${token[token.length - 1]}"`
 }
 
 function slideKey(kind: string, text: string, title: string | null): string {

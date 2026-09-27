@@ -53,7 +53,8 @@ export function registerWebContentsGuards(): void {
     contents.on('will-attach-webview', (event) => event.preventDefault())
 
     contents.setWindowOpenHandler(({ url }) => {
-      if (/^https:\/\//i.test(url)) void shell.openExternal(url)
+      // https for real links (About's developer credits, say), mailto for their email icon.
+      if (/^(https:\/\/|mailto:)/i.test(url)) void shell.openExternal(url)
       return { action: 'deny' }
     })
   })

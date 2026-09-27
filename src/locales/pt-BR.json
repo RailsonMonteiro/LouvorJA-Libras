@@ -90,7 +90,7 @@
       "hostInvalid": "Informe um IP ou nome válido, sem http://, porta ou barras.",
       "portInvalid": "A porta deve ser um número de 1 a 65535.",
       "token": "Token",
-      "tokenHint": "Aparece na aba Transmitir do LouvorJA. Neste mesmo computador não é preciso.",
+      "tokenHint": "Aparece na aba Transmitir do LouvorJA. Neste mesmo computador não é preciso. Dica: cole o link copiado por lá (botão \"Copiar Link\") em qualquer campo aqui para preencher tudo de uma vez, sem digitar o token.",
       "tokenInvalid": "O token só pode ter letras e números."
     },
     "states": {
@@ -271,6 +271,10 @@
   },
   "about": {
     "version": "Versão {version}",
+    "credits": {
+      "title": "Créditos",
+      "description": "Quem criou e mantém o Louvor JA e esta distribuição em Libras."
+    },
     "manual": {
       "title": "Manual",
       "description": "Como usar cada parte do app, e verificar se há uma versão nova.",

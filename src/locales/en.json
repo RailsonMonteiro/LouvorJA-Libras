@@ -90,7 +90,7 @@
       "hostInvalid": "Enter a valid IP or name, without http://, port or slashes.",
       "portInvalid": "The port must be a number from 1 to 65535.",
       "token": "Token",
-      "tokenHint": "Shown in the Transmitir tab of LouvorJA. Not needed on the same computer.",
+      "tokenHint": "Shown in the Transmitir tab of LouvorJA. Not needed on the same computer. Tip: paste the link copied there (\"Copiar Link\" button) into any field here to fill everything at once, without typing the token.",
       "tokenInvalid": "The token can only have letters and numbers."
     },
     "states": {
@@ -271,6 +271,10 @@
   },
   "about": {
     "version": "Version {version}",
+    "credits": {
+      "title": "Credits",
+      "description": "Who created and maintains Louvor JA and this Libras distribution."
+    },
     "manual": {
       "title": "Manual",
       "description": "How to use each part of the app, and check for a newer version.",

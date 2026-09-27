@@ -1,7 +1,7 @@
 {
   "name": "louvorja-libras",
   "productName": "LouvorJA Libras",
-  "version": "1.2.0",
+  "version": "1.4.0",
   "description": "Avatar 3D de Libras integrado ao LouvorJA. Open source e gratuito para igrejas.",
   "private": true,
   "license": "LGPL-3.0-only",

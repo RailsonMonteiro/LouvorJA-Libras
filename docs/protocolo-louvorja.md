@@ -54,13 +54,54 @@ de grupo, ou por quem configurou a máquina) em instalações Pro/corporativas. 
 Windows 11 Home Single Language, mas é o perfil de máquina onde ele mais aparece ligado por
 padrão.
 
-**Corrigido** (`ConnectionForm.vue`): os campos de Endereço e Token agora pedem explicitamente
-`autocapitalize="off"` e `autocorrect="off"` (além do `spellcheck="false"` e do
-`autocomplete="off"` que já tinham) - atributos HTML que o Chromium usa desde que esse recurso do
-Windows 11 passou a causar esse tipo de problema em campo de formulário comum (não só teclado
-virtual). O campo de token já é `type="password"` por padrão (mascarado), o que por si só já
-livra a maioria dos casos - o problema aparece principalmente se a pessoa clicar no ícone de
-"mostrar" antes de digitar, virando o campo em texto comum.
+**Mitigado, não comprovadamente corrigido** (`ConnectionForm.vue`): os campos de Endereço e
+Token pedem `autocapitalize="off"` e `autocorrect="off"` (além do `spellcheck="false"` e do
+`autocomplete="off"` que já tinham). Isso continuou acontecendo depois dessa mudança - os
+atributos HTML controlam o comportamento do próprio Chromium (autocapitalização pensada para
+teclado virtual/toque), não o recurso do Windows 11 em si (que atua na camada TSF do sistema);
+não há garantia de que um sempre implica o outro.
+
+### Atalho que evita o problema por completo (2026-09-26)
+
+Em vez de tentar impedir que o sistema altere o texto enquanto a pessoa digita, o formulário
+agora reconhece o link que o próprio botão "Copiar Link" do LouvorJA (aba Transmitir) coloca na
+área de transferência - `http://<endereço>:<porta>/?token=<token>` - e, ao colar esse link em
+**qualquer** campo do formulário de conexão, preenche endereço, porta e token de uma vez
+(`parseLouvorJALink`, `src/modules/louvorja/types/louvorja.types.ts`; colagem tratada em
+`ConnectionForm.vue`). Assim o token nunca passa pelo teclado nem por nenhum recurso de
+sugestão/autocorreção do Windows - a colagem entrega exatamente os bytes que o LouvorJA gerou,
+sem digitação manual em nenhum dos dois lados. Resolve o problema não importa qual seja a causa
+exata do lado do Windows.
+
+### Pista encontrada no código-fonte do LouvorJA (2026-09-26)
+
+Lendo o código-fonte do LouvorJA (Delphi, projeto `desktop-main`), o caminho que a v2 realmente
+usa - cabeçalho `Authorization: Bearer <token>`, lido direto de `RawHeaders` em `v2TokenValido`
+(`fmTransmitir.pas`) - não passa por nenhuma decodificação de charset (isso só afetaria acentos,
+não letras/dígitos comuns) nem por transformação de maiúscula/minúscula. Ou seja: o cabeçalho
+HTTP, que é o que `LouvorJAApiAdapter` de fato envia (`dialect` começa em `'v2'`), parece limpo.
+
+O que chama atenção é outra coisa, em `TfmIndex.lerParam` (`fmMenu.pas`): se a leitura do arquivo
+de configuração (`TIniFile.ReadString`) lançar qualquer exceção - arquivo temporariamente
+bloqueado por outro processo, antivírus, etc. - o erro é só logado, e a função **devolve o valor
+default que foi passado**, silenciosamente. O ponto que carrega o token na inicialização
+(`fmIniciando.pas`, por volta da linha 295) passa como default `fTransmitir.geraToken()` - **uma
+função que gera um token novo e aleatório a cada chamada**, diferente do padrão correto já usado
+em outros dois lugares do mesmo arquivo (`if (trim(...) = '') then ... := geraToken();`, que só
+gera um novo token se o campo estiver de fato vazio). Se essa leitura falhar nessa hora - mais
+plausível em máquinas de consumidor com antivírus/OneDrive mais agressivo, o perfil comum do
+Windows 11 Home Single Language citado no relato original - o campo na tela mostra um token
+**diferente** do que está (ou ficará) gravado no arquivo, e toda comparação seguinte falha.
+Ainda não confirmado ao vivo (não há como reproduzir sem uma máquina afetada), mas é uma causa
+plausível e teria o mesmo sintoma. Correção proposta, não aplicada ainda por ser noutro projeto:
+trocar aquele `lerParam('Servidor', 'Token', fTransmitir.geraToken())` por
+`lerParam('Servidor', 'Token', '')` seguido do mesmo idioma `if vazio then geraToken()` já usado
+alhures.
+
+Também foi adicionado um log de aviso (`LouvorJAApiAdapter`, campo `onWarning`) sempre que o
+LouvorJA responde 401: registra o _tamanho_ do token enviado e seu primeiro/último caractere
+(nunca o token inteiro), para comparar com o que a aba Transmitir mostra na próxima vez que
+alguém relatar o problema - sem essa comparação, qualquer teoria continua sendo só teoria.
 
 **Ainda não confirmado contra uma máquina real com o problema** - a pessoa que relatou pode
 testar de novo depois desta correção, ou desligar o recurso à mão (o caminho do Windows acima)

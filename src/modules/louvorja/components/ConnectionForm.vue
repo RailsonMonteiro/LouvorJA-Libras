@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useLouvorJAStore } from '../stores/louvorja.store'
-import { DEFAULT_PORT, isValidHost, isValidPort, isValidToken } from '../types/louvorja.types'
+import {
+  DEFAULT_PORT,
+  isValidHost,
+  isValidPort,
+  isValidToken,
+  parseLouvorJALink
+} from '../types/louvorja.types'
 
 const endpoint = defineModel<{ host: string; port: number | null; token: string }>({
   required: true
@@ -14,6 +20,24 @@ const hostValid = computed(() => isValidHost(endpoint.value.host.trim()))
 const portValid = computed(() => endpoint.value.port !== null && isValidPort(endpoint.value.port))
 const tokenValid = computed(() => isValidToken(endpoint.value.token.trim()))
 const canConnect = computed(() => hostValid.value && portValid.value && tokenValid.value)
+
+/**
+ * Whichever field the whole LouvorJA link lands in, fill all three from it instead of pasting it
+ * as plain text into one field - see parseLouvorJALink. A normal paste (anything else) is left
+ * completely alone.
+ */
+function pasteLink(event: ClipboardEvent): void {
+  const text = event.clipboardData?.getData('text')
+  if (!text) return
+  const parsed = parseLouvorJALink(text)
+  if (!parsed) return
+
+  event.preventDefault()
+  if (parsed.host) endpoint.value.host = parsed.host
+  if (parsed.port) endpoint.value.port = parsed.port
+  if (parsed.token) endpoint.value.token = parsed.token
+  touched.value = false
+}
 
 async function submit(): Promise<void> {
   if (store.isActive) return void (await store.disconnect())
@@ -28,7 +52,12 @@ async function submit(): Promise<void> {
 </script>
 
 <template>
-  <v-form class="connection-form" data-testid="connection-form" @submit.prevent="submit">
+  <v-form
+    class="connection-form"
+    data-testid="connection-form"
+    @submit.prevent="submit"
+    @paste="pasteLink"
+  >
     <div class="field-row">
       <div class="field host-field">
         <label class="field-label">{{ $t('integration.form.host') }}</label>

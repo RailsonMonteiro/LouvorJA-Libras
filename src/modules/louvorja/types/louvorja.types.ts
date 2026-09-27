@@ -145,6 +145,28 @@ export function isValidToken(token: string): boolean {
   return /^[A-Za-z0-9._~-]{0,64}$/.test(token)
 }
 
+/**
+ * LouvorJA's own "Copiar Link" button (Transmitir tab) copies exactly this -
+ * `http://<host>:<port>/?token=<token>` - to the clipboard. Recognizing it lets someone paste
+ * that whole link into any field of the connection form instead of retyping the token by hand:
+ * the token never passes through a keyboard (or an OS-level autocorrect/autocapitalize feature)
+ * at all, which a hand-typed token is exposed to no matter what the input field's own
+ * autocapitalize/autocorrect attributes say (see docs/protocolo-louvorja.md).
+ */
+const LOUVORJA_LINK = /^https?:\/\/([^/:?#\s]+):(\d{1,5})\/?(?:\?.*?\btoken=([^&\s]+))?/i
+
+export function parseLouvorJALink(text: string): Partial<Endpoint> | null {
+  const match = LOUVORJA_LINK.exec(text.trim())
+  if (!match) return null
+
+  const port = Number(match[2])
+  if (!isValidPort(port)) return null
+
+  const endpoint: Partial<Endpoint> = { host: match[1], port }
+  if (match[3]) endpoint.token = decodeURIComponent(match[3])
+  return endpoint
+}
+
 export function endpointKey(endpoint: Pick<Endpoint, 'host' | 'port'>): string {
   return `${endpoint.host.toLowerCase()}:${endpoint.port}`
 }
