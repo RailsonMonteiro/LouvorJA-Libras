@@ -79,6 +79,9 @@ const manualOpen = ref(false)
                 {{ $t('app.name') }}
               </div>
             </div>
+            <p class="about-purpose" data-testid="about-purpose">
+              {{ $t('about.purpose') }}
+            </p>
             <div class="about-version mt-4" data-testid="about-version">
               {{ $t('about.version', { version: app.info?.version ?? '' }) }}
             </div>
@@ -88,7 +91,7 @@ const manualOpen = ref(false)
     </v-row>
 
     <v-row class="mt-2" justify="center">
-      <v-col cols="12" md="7" lg="5">
+      <v-col cols="12" md="10" lg="8">
         <SettingsSection
           icon="mdi-account-group"
           :title="$t('about.credits.title')"
@@ -109,7 +112,7 @@ const manualOpen = ref(false)
     </v-row>
 
     <v-row class="mt-2" justify="center">
-      <v-col cols="12" md="7" lg="5">
+      <v-col cols="12" md="10" lg="8">
         <SettingsSection
           icon="mdi-book-open-variant"
           :title="$t('about.manual.title')"
@@ -281,6 +284,15 @@ const manualOpen = ref(false)
   letter-spacing: 0.6px;
   text-transform: uppercase;
   white-space: nowrap;
+}
+
+.about-purpose {
+  position: relative;
+  max-width: 480px;
+  margin: 16px 0 0;
+  color: var(--sidebar-text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 .about-version {

@@ -6,6 +6,7 @@ import type {
   SlideKind
 } from '../../../../src/modules/louvorja/types/louvorja.types'
 import { ConnectionError, type LouvorJAAdapter } from './LouvorJAAdapter'
+import { describeError } from './errorDetail'
 
 /**
  * Talks to the transmission server of the LouvorJA desktop program (the "Transmitir" tab).
@@ -290,7 +291,9 @@ export class LouvorJAApiAdapter implements LouvorJAAdapter {
       })
     } catch (error) {
       if ((error as Error).name === 'TimeoutError') throw new ConnectionError('timeout')
-      throw new ConnectionError('unreachable', (error as Error).message)
+      const detail = describeError(error)
+      this.options.onWarning?.(`Could not reach ${host}:${port}${path}: ${detail}`)
+      throw new ConnectionError('unreachable', detail)
     }
 
     if (response.status === 401) {

@@ -270,6 +270,7 @@
     "ready": "Pronto"
   },
   "about": {
+    "purpose": "Traduzir e interpretar em Libras, em tempo real, o que é projetado no LouvorJA — gratuito e de código aberto para igrejas.",
     "version": "Versão {version}",
     "credits": {
       "title": "Créditos",

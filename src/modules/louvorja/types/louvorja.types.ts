@@ -39,11 +39,14 @@ export interface ConnectionErrorInfo {
   detail: string | null
 }
 
-/** What the connected LouvorJA said about itself, so the user can check it is the right one. */
+/**
+ * What the connected server said about itself, so the user can check it is the right one.
+ * `v2`/`v1` are the original (Delphi) LouvorJA's own APIs; `violin` and `piano` are other
+ * distributions of LouvorJA with their own servers (see docs/protocolo-louvorja.md).
+ */
 export interface ServerInfo {
   version: string | null
-  /** `v2` is the documented API; `v1` is what older LouvorJA versions have. */
-  protocol: 'v2' | 'v1'
+  protocol: 'v2' | 'v1' | 'violin' | 'piano'
 }
 
 export interface ConnectionStatus {

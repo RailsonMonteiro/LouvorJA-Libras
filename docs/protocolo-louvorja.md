@@ -93,10 +93,10 @@ plausível em máquinas de consumidor com antivírus/OneDrive mais agressivo, o 
 Windows 11 Home Single Language citado no relato original - o campo na tela mostra um token
 **diferente** do que está (ou ficará) gravado no arquivo, e toda comparação seguinte falha.
 Ainda não confirmado ao vivo (não há como reproduzir sem uma máquina afetada), mas é uma causa
-plausível e teria o mesmo sintoma. Correção proposta, não aplicada ainda por ser noutro projeto:
-trocar aquele `lerParam('Servidor', 'Token', fTransmitir.geraToken())` por
+plausível e teria o mesmo sintoma. **Corrigido em `desktop-main`** (`fmIniciando.pas`, ~linha
+295): trocado `lerParam('Servidor', 'Token', fTransmitir.geraToken())` por
 `lerParam('Servidor', 'Token', '')` seguido do mesmo idioma `if vazio then geraToken()` já usado
-alhures.
+alhures no mesmo arquivo. Precisa recompilar e redistribuir o LouvorJA para valer para quem usa.
 
 Também foi adicionado um log de aviso (`LouvorJAApiAdapter`, campo `onWarning`) sempre que o
 LouvorJA responde 401: registra o _tamanho_ do token enviado e seu primeiro/último caractere
@@ -106,6 +106,73 @@ alguém relatar o problema - sem essa comparação, qualquer teoria continua sen
 **Ainda não confirmado contra uma máquina real com o problema** - a pessoa que relatou pode
 testar de novo depois desta correção, ou desligar o recurso à mão (o caminho do Windows acima)
 para confirmar se é mesmo essa a causa enquanto isso.
+
+### Comparação com outros projetos da mesma comunidade (2026-09-29)
+
+Dois outros projetos (`violin-app` e `app-Piano`, distribuições irmãs do LouvorJA) foram lidos
+para comparar como cada um lida com IP/porta/token.
+
+O interessante sobre o próprio token: **tanto `violin-app` quanto `app-Piano`, projetos e códigos
+diferentes, geram o token só com letras maiúsculas** (`violin-app`:
+`ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`, sem minúsculas, apesar do comentário no código dizer
+"mesma faixa do Delphi" - não é, o Delphi usa maiúsculas e minúsculas; `app-Piano`: hex sempre com
+`.toUpperCase()`). `violin-app` vai além e compara o token recebido de forma **insensível a
+maiúsculas/minúsculas** (`String(a).toUpperCase() === String(b).toUpperCase()`, em
+`electron/main/httpServer/auth.js`). Duas equipes diferentes convergindo para a mesma defesa é um
+indício forte de que a causa raiz (documentada acima) é real. Sugestão para o LouvorJA original,
+não aplicada por ora (o atalho de colar o link já cobre o problema do nosso lado): mudar
+`geraToken` para `A-Z0-9` e trocar a comparação exata por `SameText()`.
+
+## Suporte a outras distribuições (`violin-app`, `app-Piano`)
+
+`createAdapterFactory` (`electron/services/louvorja/adapters/createAdapter.ts`) faz um pequeno
+diagnóstico HTTP (no máximo 2 requisições - as mesmas que `LouvorJAApiAdapter.connect()` já faria)
+antes de escolher o adaptador certo:
+
+1. `GET /api/v2/ping` responde `{"app":"LouvorJA"}` → é o LouvorJA original (Delphi) com a v2.
+2. Senão, `GET /api/ping` responde `{"app":"LouvorJA"}` → LouvorJA original v1 **ou** `violin-app`
+   - os dois respondem quase igual, mas só o `violin-app` inclui os campos `authorized` e
+     `permissions` (o dele tem pareamento de dispositivos; o Delphi não). É essa a diferença usada.
+3. Nenhuma resposta HTTP (conexão recusada, não timeout) → tenta o WebSocket do `app-Piano`.
+
+### `violin-app`: adaptador próprio, via SSE (`ViolinAppAdapter.ts`)
+
+Descoberta importante: **não é compatível por fallback automático para a v1**, como a primeira
+leitura do código sugeria. `violin-app` tem seu próprio formato, nem v1 nem v2: o que está na tela
+é _empurrado_ por `GET /events` (Server-Sent Events), não perguntado por polling -
+`GET /api/song-slides?action=playing-check` existe, mas é só para a aba do app remoto, e devolve
+o array `slides` inteiro por trás, não o formato de pergunta/resposta do Delphi.
+
+Eventos SSE lidos (`electron/main/httpServer/events.js` no `violin-app`):
+
+- `music_presentation_snapshot` → `{snapshot:{active, sessionId, title, slide:{lyric}, nextSlide}}`
+  - letra atual/próxima da música (`<br>` como quebra de linha, igual ao Delphi).
+- `bible_verse` → `{text, reference, active}` - mesmo formato que a v2 do Delphi já usa.
+- `media_close` → encerra a apresentação.
+
+`slide_change`/`slides_data` (o editor, sem uma música realmente "tocando") não são tratados
+nesta primeira versão - simplificação deliberada, não descuido.
+
+### `app-Piano`: só conexão, sem legendas (`LouvorJAPianoAdapter.ts`)
+
+Decisão (2026-09-29): implementar **apenas a conexão/detecção**, sem tradução nenhuma. Motivo,
+descoberto ao ler `src/modules/remote/renderer/{liturgy-bridge,module-handlers}.ts` no próprio
+`app-Piano`: o `state` que o WebSocket empurra nunca leva o texto projetado -
+
+- Música: só `liturgy.items[].title` (nome do item, não a letra).
+- Bíblia: só `{bookId, chapter, selectedVerses: [16], versionId}` - os **números**, nunca o texto
+  do versículo.
+
+Sem o texto, não há o que traduzir para Libras. Por isso este adaptador conecta, identifica-se
+como `app-Piano` (`describe().protocol === 'piano'`) e nunca dispara um evento de slide - existe
+para a conexão não falhar de cara, não para sinalizar nada ainda.
+
+Outra particularidade aceita como está: o protocolo de controle remoto do `app-Piano` só permite
+**um cliente WebSocket por vez** (pensado para o app de celular). Conectar o LouvorJA Libras
+disputa esse lugar - se o celular já estiver conectado, a tentativa é recusada (`remote_busy`) e
+tentada de novo com o mesmo backoff de qualquer outra falha; se o LouvorJA Libras conectar
+primeiro, é o celular que fica de fora enquanto isso. Resolver isso de verdade exigiria mudar o
+`app-Piano` para aceitar mais de um cliente - fora do alcance deste projeto por ora.
 
 ### API v2 (`/api/v2/...`, documentada em `server/api-v2.html`)
 
@@ -198,3 +265,32 @@ o Indy, responde exatamente assim. Roteiro (2 minutos):
 4. Feche a música e projete um versículo na aba Bíblia: ele deve aparecer com a referência.
 
 Neste computador o LouvorJA está configurado em `192.168.110.1:4560` (não em 7070).
+
+## Diagnóstico de "não conecta" (2026-10-03)
+
+Toda falha de conexão já chegava ao log (`LouvorJAService` ouve `onStatus` e grava em
+`logs.info('louvorja', ...)`), mas o `detail` do erro, para qualquer falha de rede
+(`unreachable`), era só `error.message` - e o `fetch()` do Node (undici) embrulha a causa real
+num `TypeError: fetch failed` genérico, perdendo exatamente o dado que distingue "nada escutando
+naquela porta" (`ECONNREFUSED`, resposta imediata) de "algo descartando o pacote em silêncio"
+(`ETIMEDOUT` - sintoma comum de Firewall do Windows) - a causa real vem um ou mais `.cause` abaixo.
+
+`describeError` (`electron/services/louvorja/adapters/errorDetail.ts`) percorre essa cadeia de
+`.cause` e inclui o `code` do erro do Node (`ECONNREFUSED`, `ETIMEDOUT`, `ENETUNREACH`, etc.),
+usado agora em todo lugar que antes só pegava `.message`: `LouvorJAApiAdapter`, `ViolinAppAdapter`,
+`LouvorJAPianoAdapter` e o probe de detecção (`createAdapter.ts`) - inclusive esse último, que
+antes **descartava o erro em silêncio** (`catch { return null }`) sempre que o ping por HTTP
+falhava, perdendo o único dado de diagnóstico da causa mais comum de "não conecta" (nada responde
+HTTP) antes mesmo de tentar o WebSocket do app-Piano.
+
+Também passou a logar, uma vez por abertura do app (`electron/main/index.ts`, escopo `app`), o
+ambiente: `platform`, `arch`, `os.type()/release()/version()` e `app.getLocale()`/
+`getSystemLocale()`. Sem isso não havia como confirmar (ou descartar) se os relatos de "token
+recusado"/"não conecta" realmente se concentram numa edição/idioma específico do Windows (a
+suspeita de "Windows 11 Home Single Language" até aqui vem só do relato de quem usa, nunca de um
+log real) - a próxima vez que alguém relatar, os logs (`userData/louvorja-libras.db`, tabela
+`logs`) têm o que faltava.
+
+Confirmado ao vivo: conectar a uma porta sem nada escutando agora grava
+`"connect ECONNREFUSED 127.0.0.1:1 (ECONNREFUSED)"` em vez de um genérico "fetch failed", e o
+log de ambiente mostra a edição/idioma reais da máquina.

@@ -270,6 +270,7 @@
     "ready": "Ready"
   },
   "about": {
+    "purpose": "Translate and interpret into Libras, in real time, whatever LouvorJA projects — free and open source for churches.",
     "version": "Version {version}",
     "credits": {
       "title": "Credits",

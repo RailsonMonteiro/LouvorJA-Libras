@@ -32,14 +32,8 @@ watch(
   <div class="page-container">
     <ModuleHeader :title="$t('integration.title')" icon="fi fi-rr-link" test-id="louvorja-title" />
 
-    <v-row>
-      <v-col cols="12" md="6">
-        <ConnectionInfoCard :status="store.status" />
-      </v-col>
-    </v-row>
-
-    <v-row class="mt-2">
-      <v-col cols="12" md="6">
+    <v-row justify="center">
+      <v-col cols="12" md="7" lg="6">
         <SettingsSection icon="mdi-link-variant" :title="$t('integration.form.title')">
           <template #actions>
             <HelpIcon
@@ -53,6 +47,10 @@ watch(
           <ConnectionStatus :status="store.status" />
           <ConnectionForm v-model="form" />
         </SettingsSection>
+      </v-col>
+
+      <v-col cols="12" md="5" lg="4">
+        <ConnectionInfoCard :status="store.status" />
       </v-col>
     </v-row>
   </div>

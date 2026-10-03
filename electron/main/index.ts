@@ -1,3 +1,4 @@
+import { arch, release, type as osType, version as osVersion } from 'node:os'
 import { join } from 'node:path'
 import { app, BrowserWindow, type Tray } from 'electron'
 import { SignCache } from '../services/avatar/SignCache'
@@ -43,6 +44,19 @@ if (!app.requestSingleInstanceLock()) {
 
     logs.prune()
     logs.info('app', `Started LouvorJA Libras ${app.getVersion()}`)
+    // One line of OS/locale context per launch - the "Token recusado"/"não conecta" reports
+    // this session has chased so far all trace back to specific Windows editions and regional
+    // settings (see docs/protocolo-louvorja.md); without this, a report has no way to confirm
+    // or rule out a pattern across machines.
+    logs.info('app', 'Environment', {
+      platform: process.platform,
+      arch: arch(),
+      osType: osType(),
+      osRelease: release(),
+      osVersion: osVersion(),
+      locale: app.getLocale(),
+      systemLocale: app.getSystemLocale()
+    })
 
     const signs = new SignCache({
       dir: join(app.getPath('userData'), 'signs'),
